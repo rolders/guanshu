@@ -1,0 +1,48 @@
+{
+  "auth": {
+    "login": {
+      "title": "登录",
+      "email": "邮箱",
+      "password": "密码",
+      "submit": "登录",
+      "noAccount": "还没有账号？",
+      "loading": "加载中...",
+      "signUp": "注册"
+    },
+    "register": {
+      "title": "注册",
+      "email": "邮箱",
+      "password": "密码",
+      "name": "姓名",
+      "submit": "创建账号",
+      "haveAccount": "已有账号？",
+      "signIn": "登录"
+    }
+  },
+  "common": {
+    "error": "错误",
+    "success": "成功",
+    "dashboard": "控制台",
+    "loading": "加载中..."
+  },
+  "site": {
+    "name": "基础框架",
+    "description": "现代化、生产就绪的 Next.js 应用"
+  },
+  "error": {
+    "title": "出错了！",
+    "description": "处理您的请求时发生错误。",
+    "tryAgain": "重试"
+  },
+  "notFound": {
+    "title": "页面未找到",
+    "description": "您访问的页面不存在。",
+    "backHome": "返回首页"
+  },
+  "landing": {
+    "welcome": "欢迎使用基础框架",
+    "pleaseLogin": "请登录以继续",
+    "welcomeBack": "欢迎回来！",
+    "description": "您已成功登录基础框架"
+  }
+}

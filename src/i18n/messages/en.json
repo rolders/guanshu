@@ -1,0 +1,48 @@
+{
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "loading": "Loading..."
+    },
+    "register": {
+      "title": "Register",
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "dashboard": "Dashboard",
+    "loading": "Loading..."
+  },
+  "site": {
+    "name": "Base Stack",
+    "description": "A modern full-stack application"
+  },
+  "error": {
+    "title": "Something went wrong!",
+    "description": "An error occurred while processing your request.",
+    "tryAgain": "Try again"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist.",
+    "backHome": "Back to home"
+  },
+  "landing": {
+    "welcome": "Welcome to Base Stack",
+    "pleaseLogin": "Please log in to continue",
+    "welcomeBack": "Welcome Back!",
+    "description": "You're now logged into Base Stack"
+  }
+}
