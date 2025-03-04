@@ -36,9 +36,13 @@ export const insertUserSchema = createInsertSchema(users);
 // Schema for selecting a user
 export const selectUserSchema = createSelectSchema(users);
 
-// Initialize database with query builder
+// Initialize database with node-postgres
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  host: 'localhost',
+  port: 5432,
+  database: 'base_stack',
+  user: 'postgres',
+  password: 'postgres'
 });
 
 export const db = drizzle(pool, {

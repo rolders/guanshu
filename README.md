@@ -8,7 +8,7 @@ A modern, production-ready full-stack application template built with Next.js 15
 - **TypeScript** for type safety
 - **Tailwind CSS** with Shadcn UI components
 - **Authentication** via Lucia with role-based access control
-- **Database** using Drizzle ORM with PostgreSQL (Neon)
+- **Database** using Drizzle ORM with PostgreSQL
 - **Internationalization** with next-intl
 - **Modern UI Components** using Radix UI and Lucide icons
 - **Type-safe Forms** and validations
@@ -41,31 +41,54 @@ A modern, production-ready full-stack application template built with Next.js 15
 2. **Install dependencies**
 
    ```bash
-   npm install
-   # or
-   yarn install
-   # or
    pnpm install
    ```
 
-3. **Environment Setup**
+3. **Database Setup**
 
-   - Copy `.env.example` to `.env`
-   - Configure your environment variables:
-     - `DATABASE_URL`: Your PostgreSQL connection string
-     - `LUCIA_ENV`: Authentication environment ("DEV" or "PROD")
-     - `AUTH_SECRET`: Your authentication secret key
-     - `AUTH_TRUST_HOST`: Trusted host for authentication
-     - `API_URL`: Your API URL
-     - `DEFAULT_LOCALE`: Default language locale
-     - `SUPPORTED_LOCALES`: JSON array of supported locales
-
-4. **Development Server**
+   a. Start PostgreSQL using Docker:
    ```bash
-   npm run dev
-   # or
-   yarn dev
-   # or
+   docker run --name postgres \
+     -e POSTGRES_PASSWORD=postgres \
+     -e POSTGRES_DB=base_stack \
+     -p 5432:5432 \
+     -d postgres:15
+   ```
+
+   b. Apply database migrations:
+   ```bash
+   # Using the provided migrations.sql file
+   docker exec -i postgres psql -U postgres -d base_stack < src/lib/db/migrations.sql
+   ```
+
+   c. Create test users (optional):
+   ```bash
+   # After starting the development server
+   curl -X POST http://localhost:3006/api/test-users
+   ```
+
+4. **Environment Setup**
+
+   Create a `.env` file with the following content:
+   ```env
+   # Database
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/base_stack"
+
+   # Authentication
+   LUCIA_ENV="DEV"
+   AUTH_SECRET="your-random-secret-key"
+   AUTH_TRUST_HOST=true
+
+   # API
+   API_URL="http://localhost:3006"
+
+   # Internationalization
+   DEFAULT_LOCALE="en"
+   SUPPORTED_LOCALES='["en", "zh"]'
+   ```
+
+5. **Development Server**
+   ```bash
    pnpm dev
    ```
    Open [http://localhost:3006](http://localhost:3006) to view the application
@@ -81,7 +104,7 @@ src/
 ├── lib/               # Core utilities
 │   ├── actions/       # Server actions
 │   ├── auth/          # Authentication logic
-│   └── db/            # Database configuration
+│   └── db/            # Database configuration and migrations
 ├── types/             # TypeScript type definitions
 └── i18n/              # Internationalization
 ```
@@ -94,11 +117,19 @@ The project uses Lucia for authentication with three role types:
 - `USER`: Standard user access
 - `GUEST`: Limited access
 
-Test accounts are available for development:
+Test accounts (available after running the test-users API endpoint):
 
 - Admin: admin@test.com / admin123
 - User: user@test.com / user123
 - Guest: guest@test.com / guest123
+
+### Database Schema
+
+The authentication system uses three main tables:
+
+- `User`: Stores user information and roles
+- `Session`: Manages user sessions
+- `Key`: Stores authentication keys and password hashes
 
 ## 🌐 Internationalization
 
@@ -110,7 +141,7 @@ Supports multiple languages using next-intl:
 
 ## 🛡 Security Features
 
-- Type-safe database operations
+- Type-safe database operations with Drizzle ORM
 - Secure authentication with Lucia
 - Role-based access control
 - Server-side validation
@@ -123,6 +154,7 @@ Supports multiple languages using next-intl:
 - **Type Checking**: Strict TypeScript configuration
 - **Performance**: Built-in Next.js optimizations
 - **Testing**: Ready for implementation of test suites
+- **Database**: Local PostgreSQL in Docker for development
 
 ## 📦 Production Deployment
 
@@ -134,6 +166,12 @@ Optimized for deployment on platforms like Vercel:
 - Compression enabled
 - Cache optimization
 - Type-safe routes
+
+For production, you'll need to:
+1. Set up a production PostgreSQL database
+2. Update environment variables accordingly
+3. Set `LUCIA_ENV` to "PROD"
+4. Generate a strong `AUTH_SECRET`
 
 ## 🤝 Contributing
 
