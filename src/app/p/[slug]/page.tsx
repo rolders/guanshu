@@ -75,12 +75,14 @@ export default async function PublicPage({
         <div className="text-center mb-10">
           {page.mainIcon && (
             <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-sm">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-white shadow-md border border-gray-200">
                 <Image 
                   src={page.mainIcon} 
                   alt={page.title}
-                  width={48}
-                  height={48}
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                  priority
                 />
               </div>
             </div>

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import ImageUpload from "./ImageUpload";
 
 interface PageFormProps {
   locale: string;
@@ -19,6 +20,7 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logoImage, setLogoImage] = useState<string | null>(page?.mainIcon || null);
   const [formData, setFormData] = useState({
     title: page?.title || "",
     slug: page?.slug || "",
@@ -66,9 +68,15 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
     setError(null);
 
     try {
+      // Include the logo image in the form data
+      const pageData = {
+        ...formData,
+        mainIcon: logoImage
+      };
+
       if (isEditing && page) {
         // Update existing page
-        const result = await updatePage(page.id, formData);
+        const result = await updatePage(page.id, pageData);
 
         if (!result.success) {
           throw new Error(result.error || "Failed to update page");
@@ -78,7 +86,7 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
         router.refresh();
       } else {
         // Create new page
-        const result = await createPage(formData);
+        const result = await createPage(pageData);
 
         if (!result.success) {
           throw new Error(result.error || "Failed to create page");
@@ -103,6 +111,11 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
       )}
 
       <div className="space-y-4">
+        <ImageUpload 
+          currentImage={page?.mainIcon || null} 
+          onChange={(value) => setLogoImage(value)}
+        />
+
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
             Page Title *
@@ -122,7 +135,7 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
             Slug *
           </label>
           <div className="flex items-center">
-            <span className="text-gray-500 mr-2">/{locale}/p/</span>
+            <span className="text-gray-500 mr-2">/p/</span>
             <Input
               id="slug"
               name="slug"

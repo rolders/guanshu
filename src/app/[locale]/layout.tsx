@@ -95,15 +95,17 @@ export default async function LocaleLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className={inter.className}>
+      <body suppressHydrationWarning>
         <NextIntlClientProvider
           messages={messages}
           locale={locale}
           now={now}
           timeZone="Asia/Shanghai"
         >
-          <Topbar user={userAttributes} />
-          {children}
+          <div className={inter.className}>
+            <Topbar user={userAttributes} />
+            {children}
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>
