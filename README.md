@@ -1,186 +1,139 @@
-# Base Stack
+# 关树 Guanshu - Chinese Social Media Follower Hub
 
-A modern, production-ready full-stack application template built with Next.js 15, TypeScript, Tailwind CSS with Shadcn UI components, and Drizzle ORM. Featuring a beautiful, accessible UI out of the box.
+A modern web application that enables Chinese content creators to centralize and manage their audience across key platforms like Xiaohongshu, WeChat, Douyin, and Bilibili.
 
-## 🚀 Features
+## 🌟 Features
 
-- **Next.js 15** with App Router and Server Components
-- **TypeScript** for type safety
-- **Tailwind CSS** with Shadcn UI components
-- **Authentication** via Lucia with role-based access control
-- **Database** using Drizzle ORM with PostgreSQL
-- **Internationalization** with next-intl
-- **Modern UI Components** using Radix UI and Lucide icons
-- **Type-safe Forms** and validations
-- **Dark Mode** support
-- **Production Optimizations** including image optimization and caching
+### For Content Creators
+- Create multiple personalized landing pages
+- Aggregate social media links in one place
+- Customize page themes and styling
+- Track page views and link clicks
+- Collect follower information securely
+- Support for multiple languages (English/中文)
 
-## 🛠 Tech Stack
+### Page Customization
+- 5 beautiful themes:
+  - Default: Clean, modern look with indigo-to-blue gradient
+  - Minimal: Simple, clean design with white background
+  - Dark: Elegant dark theme
+  - Colorful: Vibrant theme with pink-to-purple gradient
+  - Professional: Sophisticated theme with slate gradients
+- Custom background images with fit options (cover, contain, repeat)
+- Background image visibility toggle
+- Custom main icon/profile picture
+- Customizable contact form
 
-- **Framework**: Next.js 15
-- **Language**: TypeScript
-- **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: Lucia
-- **Styling**: Tailwind CSS, Shadcn UI
-- **Components**: Radix UI
-- **Icons**: Lucide
-- **State Management**: React Server Components
-- **Form Handling**: React Hook Form (implied)
-- **API**: Next.js API Routes
-- **Development**: ESLint, TypeScript
+### Social Media Integration
+- Support for major Chinese platforms:
+  - Xiaohongshu (小红书)
+  - WeChat (微信)
+  - Douyin (抖音)
+  - Bilibili (哔哩哔哩)
+  - Weibo (微博)
+  - Zhihu (知乎)
+- Custom link support for other platforms
+- Custom icons for each link
 
-## 🚦 Getting Started
+## 🚀 Tech Stack
 
-1. **Clone the repository**
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript (strict mode)
+- **Database**: PostgreSQL + Drizzle ORM
+- **Authentication**: Lucia with Scrypt password hashing
+- **Styling**: Tailwind CSS + Shadcn UI
+- **Components**: Radix UI + Lucide icons
+- **Forms**: React Hook Form
+- **Internationalization**: next-intl
 
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- PostgreSQL database
+- Git
+
+### Installation
+
+1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd base-stack
+   git clone https://github.com/yourusername/socialmedia_aggregator_cn.git
+   cd socialmedia_aggregator_cn
    ```
 
-2. **Install dependencies**
-
+2. Install dependencies:
    ```bash
-   pnpm install
+   npm install
    ```
 
-3. **Database Setup**
-
-   a. Start PostgreSQL using Docker:
+3. Set up environment variables:
    ```bash
-   docker run --name postgres \
-     -e POSTGRES_PASSWORD=postgres \
-     -e POSTGRES_DB=base_stack \
-     -p 5432:5432 \
-     -d postgres:15
+   cp .env.example .env
+   ```
+   Edit `.env` with your configuration:
+   ```
+   DATABASE_URL="postgresql://username:password@localhost:5432/database_name"
+   AUTH_SECRET="your-secret-key"
    ```
 
-   b. Apply database migrations:
+4. Run database migrations:
    ```bash
-   # Using the provided migrations.sql file
-   docker exec -i postgres psql -U postgres -d base_stack < src/lib/db/migrations.sql
+   npm run db:migrate
    ```
 
-   c. Create test users (optional):
+5. Start the development server:
    ```bash
-   # After starting the development server
-   curl -X POST http://localhost:3006/api/test-users
+   npm run dev
    ```
 
-4. **Environment Setup**
-
-   Create a `.env` file with the following content:
-   ```env
-   # Database
-   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/base_stack"
-
-   # Authentication
-   LUCIA_ENV="DEV"
-   AUTH_SECRET="your-random-secret-key"
-   AUTH_TRUST_HOST=true
-
-   # API
-   API_URL="http://localhost:3006"
-
-   # Internationalization
-   DEFAULT_LOCALE="en"
-   SUPPORTED_LOCALES='["en", "zh"]'
-   ```
-
-5. **Development Server**
-   ```bash
-   pnpm dev
-   ```
-   Open [http://localhost:3006](http://localhost:3006) to view the application
+The application will be available at `http://localhost:3000`.
 
 ## 📁 Project Structure
 
 ```
 src/
-├── app/                 # Next.js app directory
-├── components/         # React components
-│   ├── ui/            # Shared UI components
-│   └── ...            # Feature-specific components
-├── lib/               # Core utilities
-│   ├── actions/       # Server actions
-│   ├── auth/          # Authentication logic
-│   └── db/            # Database configuration and migrations
-├── types/             # TypeScript type definitions
-└── i18n/              # Internationalization
+├── app/                    # Next.js app directory
+│   ├── [locale]/          # Internationalized routes
+│   │   ├── dashboard/     # Dashboard pages
+│   │   └── p/            # Public profile pages
+│   └── globals.css        # Global styles
+├── components/            # Shared components
+│   └── ui/               # UI components
+├── lib/                   # Utilities and configurations
+│   ├── actions/          # Server actions
+│   ├── auth/             # Authentication
+│   ├── db/               # Database configuration
+│   └── utils/            # Helper functions
+└── types/                # TypeScript type definitions
 ```
 
-## 🔐 Authentication
+## 🔒 Security
 
-The project uses Lucia for authentication with three role types:
-
-- `ADMIN`: Full system access
-- `USER`: Standard user access
-- `GUEST`: Limited access
-
-Test accounts (available after running the test-users API endpoint):
-
-- Admin: admin@test.com / admin123
-- User: user@test.com / user123
-- Guest: guest@test.com / guest123
-
-### Database Schema
-
-The authentication system uses three main tables:
-
-- `User`: Stores user information and roles
-- `Session`: Manages user sessions
-- `Key`: Stores authentication keys and password hashes
+- Secure password hashing with Scrypt
+- Protected API routes
+- Input validation and sanitization
+- CSRF protection
+- Rate limiting
 
 ## 🌐 Internationalization
 
-Supports multiple languages using next-intl:
-
+The application supports multiple languages:
 - English (en)
 - Chinese (zh)
-- Add more languages by extending the locale configuration
 
-## 🛡 Security Features
+## 📝 License
 
-- Type-safe database operations with Drizzle ORM
-- Secure authentication with Lucia
-- Role-based access control
-- Server-side validation
-- Protected API routes
-- Secure session management
-
-## 🔧 Development
-
-- **Code Style**: ESLint configuration for Next.js
-- **Type Checking**: Strict TypeScript configuration
-- **Performance**: Built-in Next.js optimizations
-- **Testing**: Ready for implementation of test suites
-- **Database**: Local PostgreSQL in Docker for development
-
-## 📦 Production Deployment
-
-Optimized for deployment on platforms like Vercel:
-
-- Automatic image optimization
-- Edge-compatible
-- Production logging
-- Compression enabled
-- Cache optimization
-- Type-safe routes
-
-For production, you'll need to:
-1. Set up a production PostgreSQL database
-2. Update environment variables accordingly
-3. Set `LUCIA_ENV` to "PROD"
-4. Generate a strong `AUTH_SECRET`
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+## 🙏 Acknowledgments
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Shadcn UI](https://ui.shadcn.com/)
+- [Lucia](https://lucia-auth.com/)
+- [Drizzle ORM](https://orm.drizzle.team/)

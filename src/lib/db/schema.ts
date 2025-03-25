@@ -40,6 +40,7 @@ export const pages = pgTable("Page", {
   slug: text("slug").unique().notNull(),
   description: text("description"),
   backgroundImage: text("background_image"),
+  backgroundImageFit: text("background_image_fit").default("cover"),
   mainIcon: text("main_icon"),
   theme: text("theme").default("default"),
   customColors: jsonb("custom_colors"),

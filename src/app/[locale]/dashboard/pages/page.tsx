@@ -56,7 +56,7 @@ export default async function PagesListPage({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pages.map((page) => {
-            const publicPagePath = `/${locale}/p/${page.slug}`;
+            const publicPagePath = `/p/${page.slug}`;
             const editPagePath = `/${locale}/dashboard/pages/${page.id}`;
             
             return (

@@ -1,6 +1,5 @@
 // src/app/[locale]/layout.tsx
 
-import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -10,12 +9,6 @@ import { Topbar } from "@/components/ui/topbar";
 import { getPageSession } from "@/lib/auth/lucia";
 import { DatabaseUserAttributes } from "@/lib/auth/types";
 import "../globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
 
 // Type guard for session user
 interface SessionUser {
@@ -91,9 +84,11 @@ export default async function LocaleLayout({
       : null;
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning={false}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="next-head-count" content="0" />
+        <meta name="next-locale" content={locale} />
       </head>
       <body suppressHydrationWarning>
         <NextIntlClientProvider
@@ -102,7 +97,7 @@ export default async function LocaleLayout({
           now={now}
           timeZone="Asia/Shanghai"
         >
-          <div className={inter.className}>
+          <div className="font-sans">
             <Topbar user={userAttributes} />
             {children}
           </div>

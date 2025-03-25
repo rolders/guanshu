@@ -71,19 +71,29 @@ export default async function PublicPage({
   };
   
   return (
-    <div className={`min-h-screen ${themeStyles.background} ${themeStyles.text}`}>
+    <div 
+      className={`min-h-screen ${themeStyles.background} ${themeStyles.text}`}
+      style={{
+        ...(page.backgroundImage ? {
+          backgroundImage: `url(${page.backgroundImage})`,
+          backgroundSize: page.backgroundImageFit === "repeat" ? "auto" : page.backgroundImageFit as "cover" | "contain",
+          backgroundRepeat: page.backgroundImageFit === "repeat" ? "repeat" : "no-repeat",
+          backgroundPosition: "center",
+        } : {}),
+      }}
+    >
       <div className="max-w-4xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           {page.mainIcon && (
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <Image 
-                  src={page.mainIcon} 
-                  alt={page.title}
-                  width={48}
-                  height={48}
-                />
-              </div>
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              <Image 
+                src={page.mainIcon} 
+                alt={page.title}
+                fill
+                className="rounded-full object-cover border border-border shadow-sm"
+                sizes="96px"
+                priority
+              />
             </div>
           )}
           

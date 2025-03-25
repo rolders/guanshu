@@ -44,6 +44,7 @@ export default async function EditPagePage({
     slug: pageData.slug,
     description: pageData.description,
     backgroundImage: pageData.backgroundImage,
+    backgroundImageFit: (pageData.backgroundImageFit || 'cover') as 'cover' | 'contain' | 'repeat',
     mainIcon: pageData.mainIcon,
     theme: pageData.theme || 'default',
     customColors: pageData.customColors as Record<string, string> | null,
@@ -73,13 +74,14 @@ export default async function EditPagePage({
           {page.isPublished ? (
             <span className="text-green-600">
               Published at{" "}
-              <Link
+              <a
                 href={`/p/${page.slug}`}
                 className="underline"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 /p/{page.slug}
-              </Link>
+              </a>
             </span>
           ) : (
             <span className="text-yellow-600">Draft (not published)</span>

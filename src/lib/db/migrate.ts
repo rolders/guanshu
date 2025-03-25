@@ -2,6 +2,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as initialMigration from "./migrations/0000_initial";
 import * as guanshuTables from "./migrations/0001_guanshu_tables";
+import * as backgroundImageFit from "./migrations/0002_add_background_image_fit";
+import * as backgroundImageVisible from "./migrations/0003_add_background_image_visible";
 import * as dotenv from "dotenv";
 
 // Load environment variables
@@ -32,6 +34,14 @@ async function migrate() {
     console.log("Running guanshu tables migration (0001)...");
     await guanshuTables.up(db);
     
+    // Run background image fit migration
+    console.log("Running background image fit migration (0002)...");
+    await backgroundImageFit.up(db);
+    
+    // Run background image visible migration
+    console.log("Running background image visible migration (0003)...");
+    await backgroundImageVisible.up(db);
+    
     console.log("Migrations completed successfully");
   } catch (error) {
     console.error("Error running migrations:", error);
@@ -60,12 +70,17 @@ export async function rollback() {
     console.log("Rolling back migrations...");
     
     // Rollback in reverse order
+    console.log("Rolling back background image visible migration (0003)...");
+    await backgroundImageVisible.down(db);
+    
+    console.log("Rolling back background image fit migration (0002)...");
+    await backgroundImageFit.down(db);
+    
     console.log("Rolling back guanshu tables migration (0001)...");
     await guanshuTables.down(db);
     
     console.log("Rolling back initial migration (0000)...");
-    // Uncomment the next line if you want to roll back the initial migration too
-    // await initialMigration.down(db);
+    await initialMigration.down(db);
     
     console.log("Rollback completed successfully");
   } catch (error) {
@@ -78,23 +93,11 @@ export async function rollback() {
 
 // Run migrations if this file is executed directly
 if (require.main === module) {
-  const args = process.argv.slice(2);
-  const command = args[0];
-  
-  if (command === 'rollback') {
-    rollback()
-      .then(() => process.exit(0))
-      .catch((error) => {
-        console.error(error);
-        process.exit(1);
-      });
+  const isRollback = process.argv.includes("rollback");
+  if (isRollback) {
+    rollback().catch(console.error);
   } else {
-    migrate()
-      .then(() => process.exit(0))
-      .catch((error) => {
-        console.error(error);
-        process.exit(1);
-      });
+    migrate().catch(console.error);
   }
 }
 

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import ImageUpload from "./ImageUpload";
+import { BackgroundImageSettings } from "./BackgroundImageSettings";
 
 interface PageFormProps {
   locale: string;
@@ -21,6 +22,13 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logoImage, setLogoImage] = useState<string | null>(page?.mainIcon || null);
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(page?.backgroundImage || null);
+  const [backgroundImageFit, setBackgroundImageFit] = useState<"cover" | "contain" | "repeat">(
+    page?.backgroundImageFit || "cover"
+  );
+  const [backgroundImageVisible, setBackgroundImageVisible] = useState<boolean>(
+    page?.backgroundImageVisible ?? true
+  );
   const [formData, setFormData] = useState({
     title: page?.title || "",
     slug: page?.slug || "",
@@ -68,10 +76,13 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
     setError(null);
 
     try {
-      // Include the logo image in the form data
+      // Include the logo image and background image in the form data
       const pageData = {
         ...formData,
-        mainIcon: logoImage
+        mainIcon: logoImage,
+        backgroundImage: backgroundImage,
+        backgroundImageFit: backgroundImageFit,
+        backgroundImageVisible: backgroundImageVisible
       };
 
       if (isEditing && page) {
@@ -112,8 +123,20 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
 
       <div className="space-y-4">
         <ImageUpload 
-          currentImage={page?.mainIcon || null} 
-          onChange={(value) => setLogoImage(value)}
+          currentImage={logoImage} 
+          onImageChange={setLogoImage}
+          aspectRatio="1:1"
+          maxSize={2}
+          className="w-32 h-32"
+        />
+
+        <BackgroundImageSettings
+          backgroundImage={backgroundImage}
+          backgroundImageFit={backgroundImageFit}
+          backgroundImageVisible={backgroundImageVisible}
+          onBackgroundImageChange={setBackgroundImage}
+          onBackgroundImageFitChange={setBackgroundImageFit}
+          onBackgroundImageVisibleChange={setBackgroundImageVisible}
         />
 
         <div>
@@ -157,10 +180,10 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
           <Textarea
             id="description"
             name="description"
-            value={formData.description || ""}
+            value={formData.description}
             onChange={handleChange}
             className="w-full"
-            rows={4}
+            rows={3}
           />
         </div>
 
@@ -168,13 +191,13 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
           <Checkbox
             id="hasContactForm"
             checked={formData.hasContactForm}
-            onCheckedChange={(checked: boolean | "indeterminate") => 
-              handleCheckboxChange("hasContactForm", checked === true)
+            onCheckedChange={(checked) =>
+              handleCheckboxChange("hasContactForm", checked as boolean)
             }
           />
           <label
             htmlFor="hasContactForm"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium text-gray-700"
           >
             Enable contact form
           </label>
@@ -184,28 +207,26 @@ export default function PageForm({ locale, page, isEditing = false }: PageFormPr
           <Checkbox
             id="isPublished"
             checked={formData.isPublished}
-            onCheckedChange={(checked: boolean | "indeterminate") => 
-              handleCheckboxChange("isPublished", checked === true)
+            onCheckedChange={(checked) =>
+              handleCheckboxChange("isPublished", checked as boolean)
             }
           />
           <label
             htmlFor="isPublished"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium text-gray-700"
           >
             Publish page
           </label>
         </div>
       </div>
 
-      <div>
-        <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
-          {isSubmitting
-            ? isEditing
-              ? "Updating..."
-              : "Creating..."
-            : isEditing
-            ? "Update Page"
-            : "Create Page"}
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Saving..." : isEditing ? "Save Changes" : "Create Page"}
         </Button>
       </div>
     </form>

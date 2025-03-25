@@ -3,13 +3,23 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Upload, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
   currentImage: string | null;
-  onChange: (value: string | null) => void;
+  onImageChange: (image: string | null) => void;
+  maxSize?: number; // in MB
+  aspectRatio?: string;
+  className?: string;
 }
 
-export default function ImageUpload({ currentImage, onChange }: ImageUploadProps) {
+export default function ImageUpload({
+  currentImage,
+  onImageChange,
+  maxSize = 2,
+  aspectRatio = "1:1",
+  className,
+}: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,13 +27,13 @@ export default function ImageUpload({ currentImage, onChange }: ImageUploadProps
     if (!file) return;
 
     // File type and size validation
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Image must be smaller than 2MB');
+    if (file.size > maxSize * 1024 * 1024) {
+      alert(`Image must be smaller than ${maxSize}MB`);
       return;
     }
 
@@ -31,60 +41,56 @@ export default function ImageUpload({ currentImage, onChange }: ImageUploadProps
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       setPreview(dataUrl);
-      onChange(dataUrl);
+      onImageChange(dataUrl);
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemove = () => {
     setPreview(null);
-    onChange(null);
+    onImageChange(null);
   };
 
   return (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Page Logo/Avatar
-      </label>
-      
-      <div className="flex items-center gap-4">
-        {preview ? (
-          <div className="relative w-20 h-20">
+    <div className={cn("relative", className)}>
+      {preview ? (
+        <>
+          <div className="relative w-full h-full">
             <Image
               src={preview}
-              alt="Page logo"
+              alt="Image preview"
               fill
-              className="rounded-full object-cover border border-gray-200"
+              className="object-cover rounded-lg border border-border"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <button
               type="button"
               onClick={handleRemove}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 shadow-sm hover:bg-destructive/90 transition-colors"
             >
-              <X size={16} />
+              <X className="h-4 w-4" />
             </button>
           </div>
-        ) : (
-          <div className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-gray-300 rounded-full">
-            <label className="cursor-pointer text-center p-2">
-              <Upload size={24} className="mx-auto text-gray-400" />
-              <span className="mt-1 text-xs text-gray-500">Upload</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </label>
+        </>
+      ) : (
+        <label className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-muted rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Click to upload
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {aspectRatio} • Max {maxSize}MB
+            </p>
           </div>
-        )}
-        
-        <div className="text-xs text-gray-500">
-          <p>Upload a logo or avatar for your page</p>
-          <p>Recommended: Square image (1:1 ratio)</p>
-          <p>Maximum size: 2MB</p>
-        </div>
-      </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </label>
+      )}
     </div>
   );
 } 

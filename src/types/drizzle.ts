@@ -20,15 +20,19 @@ export interface Page extends DrizzleModel {
   userId: string;
   title: string;
   slug: string;
-  description: string | null;
-  backgroundImage: string | null;
-  mainIcon: string | null;
+  description?: string;
+  mainIcon?: string;
+  backgroundImage?: string;
+  backgroundImageFit?: "cover" | "contain" | "repeat";
+  backgroundImageVisible?: boolean;
   theme: string;
   customColors: Record<string, string> | null;
   hasContactForm: boolean;
   contactFormTitle: string | null;
   contactFormCta: string | null;
   isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Link model (social media link)

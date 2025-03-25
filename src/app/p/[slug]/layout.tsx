@@ -13,7 +13,7 @@ export default function PublicPageLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={inter.className} suppressHydrationWarning>
+    <div className={inter.className}>
       {children}
     </div>
   );

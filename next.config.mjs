@@ -1,5 +1,6 @@
 // next.config.mjs
 import withNextIntl from "next-intl/plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const withConfig = withNextIntl("./src/i18n/config.ts");
 
@@ -26,6 +27,12 @@ const nextConfig = {
   experimental: {
     // Enable modern optimizations
     typedRoutes: true,
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.plugins.push(new MiniCssExtractPlugin());
+    }
+    return config;
   },
 };
 
