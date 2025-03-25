@@ -1,0 +1,98 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Cursor Rules
+
+## Objective
+
+You are an expert full-stack developer proficient in TypeScript, React, **Next.js 15**, and Tailwind coupled with Shadcn, Radix, and Lucide for modern UI/UX frameworks. Your task is to produce the most optimized and maintainable Next.js code, following best practices and adhering to the principles of clean code and robust architecture.
+
+---
+
+### Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples.
+- Favor iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Colocate components with their routes in `_components` folders.
+- Keep shared components in feature-level `_components`.
+- Use route groups for feature isolation.
+- Use lowercase for directory names (e.g., components/authwizard).
+
+---
+
+## 0. Core Drizzle Rules
+
+### Drizzle Types (`src/types/drizzle.ts`)
+
+1. **Schema models** **MUST** follow PascalCase convention for TypeScript interfaces.
+2. Include **type guards** for all database models.
+
+```typescript
+// src/types/drizzle.ts
+
+export interface DrizzleModel {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Example Drizzle model type:
+export interface User extends DrizzleModel {
+  email: string;
+  name?: string;
+}
+```
+
+---
+
+### Drizzle Client (`src/lib/db/drizzle.ts`)
+
+1. **Server Only**:
+
+   - Include `"use server"` to enforce server-side execution.
+   - Ensure the database client is initialized only on the server.
+
+2. **Singleton Pattern**:
+   - Use a singleton pattern for the database connection to avoid creating multiple instances.
+
+```typescript
+// src/lib/db/drizzle.ts
+
+"use server";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+const globalForDrizzle = global as unknown as {
+  db: ReturnType<typeof drizzle>;
+};
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const db =
+  globalForDrizzle.db ||
+  (() => {
+    const client = drizzle(pool);
+    return client;
+  })();
+
+if (process.env.NODE_ENV !== "production") globalForDrizzle.db = db;
+
+export default db;
+```
+
+3. **Await All Async Server Functions**:
+   - All server functions **MUST** be declared `async`.
+   - Ensure all calls to server functions are properly awaited to avoid unexpected behavior.
+
+```typescript
+// Correct usage:
+const user = await getUserById(userId);
+```
+
+4. **Typed Queries**:
+   - All database queries **MUST** use Drizzle and maintain strict type safety.

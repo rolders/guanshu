@@ -1,0 +1,171 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: next.js postgres migration authentication typescript and environment
+globs: 
+alwaysApply: false
+---
+ # Critical Application Rules
+
+## 1. Database Configuration
+
+### 1.1 Connection Strings
+
+- Always use the correct format for your database connection string
+- For local PostgreSQL: `postgres://username@localhost:5432/database_name`
+- For production: Use environment-specific connection strings with proper credentials
+- Always test database connection during setup
+
+### 1.2 Schema Definition
+
+- Use proper Drizzle ORM syntax for column types
+- For array types, use `.array()` method instead of the legacy `array()` function:
+
+  ```typescript
+  // ❌ WRONG:
+  ingredients: array(text("ingredients")).notNull();
+
+  // ✅ CORRECT:
+  ingredients: text("ingredients").array().notNull();
+  ```
+
+- Always validate schema migrations before applying them
+
+## 2. Authentication
+
+### 2.1 Password Hashing
+
+- Use the same password hashing algorithm consistently throughout the app
+- When using Lucia auth with Scrypt:
+  - Password hashes must be in format: `[salt]:[hash]`
+  - Always use Lucia's own hash generation for compatibility:
+    ```typescript
+    const scrypt = new Scrypt();
+    const hashedPassword = await scrypt.hash(password);
+    ```
+- Never mix different hashing algorithms in the same application
+- Test user login after creating test users
+
+### 2.2 User Management
+
+- Create appropriate test accounts for different user roles
+- Set up proper role-based access control
+- Use appropriate user schemas and type definitions
+- Ensure type safety by properly typing user objects
+
+## 3. TypeScript Configuration
+
+### 3.1 Type Safety
+
+- Use proper type declarations for all entities
+- Extend auth types when needed:
+  ```typescript
+  // In src/lib/auth/types.ts
+  declare module "lucia" {
+    interface DatabaseUserAttributes {
+      id: string;
+      email: string;
+      name?: string;
+      role: "ADMIN" | "USER" | "GUEST";
+    }
+  }
+  ```
+- Use type casting carefully and only when necessary
+- Prefer interfaces for complex types and `as const` for literals
+
+### 3.2 API Design
+
+- Use proper parameter types for server actions and API endpoints
+- Return typed responses from all API calls
+- Handle errors consistently with proper types
+
+## 4. Environment Setup
+
+### 4.1 Environment Variables
+
+- Always create a comprehensive `.env` file with all required variables
+- Include comments explaining each variable
+- Generate secure random keys for auth secrets
+- Document all environment variables in README.md
+
+### 4.2 Migrations and Seeding
+
+- Create proper database migration scripts
+- Include seed data for initial setup
+- Test migrations and seeds before deploying
+- Create backup procedures for database content
+
+## 5. Error Handling
+
+### 5.1 Frontend Errors
+
+- Display meaningful error messages to users
+- Log detailed errors server-side
+- Handle auth errors gracefully
+- Provide recovery paths for common errors
+
+### 5.2 API Errors
+
+- Use consistent error response format
+- Include appropriate HTTP status codes
+- Add error details for developers
+- Sanitize error messages for security
+
+## 6. Next.js 15 Requirements
+
+### 6.1 Server Actions
+
+- All functions exported from files with "use server" directive MUST be async
+- Non-async utility functions should be moved to separate files
+- Each server action file should have only ONE "use server" directive at the top
+- Server components must properly handle dynamic parameters as Promises
+
+### 6.2 Dynamic Route Parameters
+
+- Dynamic route parameters in Next.js 15 are passed as Promises and MUST be awaited
+- Never destructure locale directly from params without awaiting:
+  ```typescript
+  // ❌ WRONG:
+  export default async function Page({ params: { locale } }) {
+    // This will cause runtime errors
+  }
+
+  // ✅ CORRECT:
+  export default async function Page({ params }) {
+    const { locale } = await params;
+    // Now locale can be safely used
+  }
+  ```
+- Update interface definitions to reflect Promise type:
+  ```typescript
+  interface PageProps {
+    params: Promise<{ locale: string; }>;
+  }
+  ```
+- Apply this pattern consistently across all page components
+
+### 6.3 Database Schema Synchronization
+
+- Maintain migrations for all schema changes
+- Create idempotent migrations that check for column existence
+- Run migrations before deploying new code changes
+- Update TypeScript interfaces when schema changes
+
+## 7. Recipe-Specific Requirements
+
+### 7.1 Weight Units and Measurements
+
+- Always use the standard weight units (g, kg, oz, lb)
+- Default to grams (g) for new recipes
+- Support conversion between metric and imperial units
+- Store the base serving size for proper scaling calculations
+
+### 7.2 Ingredient Structure
+
+- Store ingredient details in structured JSON format
+- Include multilingual support for ingredient names
+- Track preparation instructions per ingredient
+- Support ingredient grouping by sections

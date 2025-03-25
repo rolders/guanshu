@@ -1,0 +1,227 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🚀 Chinese Social Media Follower Hub - 关树 Guanshu
+
+## 🎯 Project Name & Goal
+
+**Name**: 关树 Guanshu
+**Goal**: Build a web application that enables Chinese content creators to centralize and manage their audience across key platforms (Xiaohongshu, WeChat, Douyin, and Bilibili). The app should allow creators to aggregate social media links, securely capture follower data (emails, phone numbers, WeChat IDs), and display basic analytics. The experience will be similar to Linktree or Milkshake—optimized for China with self-hosted fonts (no reliance on Google Fonts). The web-application should support multiple users, and each user should be able to create multiple pages. 
+
+---
+
+## 🔧 Required Tech Stack & Setup
+
+- **Framework**: Next.js 15  
+  - Use the App Router and React Server Components.  
+  - Follow Next.js 15 rules: async server actions, single "use server" directive, and dynamic route parameters must be awaited.
+- **Language**: TypeScript (strict mode, proper type declarations, extended auth types)
+- **Database**: PostgreSQL + Drizzle ORM  
+  - Use proper Drizzle ORM syntax (e.g., for array types, use `.array()`).
+- **Authentication**: Lucia  
+  - Use Scrypt for password hashing with hashes in the format `[salt]:[hash]`.
+- **Styling**: Tailwind CSS + Shadcn UI  
+  - Utilize Radix UI for accessible components.
+- **Icons**: Lucide  
+- **Forms**: React Hook Form (with proper validations)
+- **API/Server Actions**: Next.js API Routes or server actions  
+- **Environment**: ESLint, Prettier, comprehensive `.env` file with documentation  
+- **Font Hosting**: Self-host fonts or use a China-based CDN (avoid Google Fonts to prevent issues with China GFW)
+
+---
+
+## 🎯 Target Use Cases
+
+1. **Centralization of Social Media**  
+   - Creators can display links to their profiles on Xiaohongshu, WeChat, Douyin, Bilibili & others
+2. **Data Capture**  
+   - Securely collect follower information (emails, phone numbers, WeChat IDs).
+3. **Analytics**  
+   - Provide insights on page views, link clicks, and form submissions on a creator dashboard
+4. **Mobile-First Experience**  
+   - Optimize for fast loading and mobile-friendly design using self-hosted fonts and local CDN resources.
+
+---
+
+## 🌟 Core MVP Features
+
+### 1. Authentication & Onboarding 🔐
+
+- **User Registration/Login**:  
+  - Implement with Lucia using Scrypt for password hashing.  
+  - Store credentials in PostgreSQL with proper hashing (`[salt]:[hash]` format).  
+  - Use a minimal sign-up form (fields: `email`, `password`, `displayName`).
+- **Onboarding Flow**:  
+  - Redirect to a Dashboard after successful login.
+
+### 2. Dashboard 📊
+
+- Display user profile info and a summary of the aggregator pages (each user can create multiple aggregator pages)
+- Show basic analytics per aggregator page (page views, link clicks, follower details captured)
+
+### 3. Aggregator Page Editor ✏️
+
+- **Page Settings**:  
+  - Allow setting of title, short slug (e.g., `myapp.com/p/[slug]`), and optional custom domain.
+- **Social Media Links**:  
+  - Input fields for social media (including but not limited to Xiaohongshu, WeChat (Official Account link or QR code embed), Douyin, Bilibili)
+  - Option to add additional custom links.
+- **Contact Capture Form**:  
+  - Toggle form to collect follower details (phone, email, WeChat ID) using React Hook Form with validations. 
+  - The contact capture form should have a configurable call to action message (e.g. "subscribe to our newsletter")
+- **Card-Based Layout (Optional)**:  
+  - Allow creation of customizable “cards” for images, text, or videos.
+- **Theme & Styling**:  
+  - Utilize Tailwind CSS with Shadcn UI and Radix UI components.
+  - Self-host fonts or use a China-based CDN.
+  - Allow user to select colour theme and configure background image, main page icon etc. 
+
+### 4. Public Aggregator Page 🌐
+
+- Accessible at `myapp.com/p/[slug]`  
+  - **Important**: Follow Next.js 15 rules by awaiting dynamic route parameters.
+- Display the creator's social media links and the contact form (if configured)
+- Capture and store analytics (views and link clicks).
+
+### 5. Analytics 📈
+
+- Track page views, link clicks per link, and form submissions.
+- Show aggregated data in the Dashboard.
+
+### 6. Admin Tools (Optional) 🛠️
+
+- Provide a basic admin route for managing users/pages if needed.
+
+---
+
+## 🗄️ Database Schema (Drizzle ORM)
+
+**User** Table:
+- `id` (primary key)
+- `email` (unique)
+- `hashed_password`
+- `displayName`
+- `created_at` (timestamp)
+- `updated_at` (timestamp)
+
+**Page** Table:
+- `id` (primary key)
+- `user_id` (foreign key to User)
+- `title` (string)
+- `slug` (unique, string)
+- `theme` (optional, for style presets)
+- `created_at`, `updated_at`
+
+**Link** Table (for social media links):
+- `id`
+- `page_id` (foreign key to Page)
+- `platform` (e.g., "xiaohongshu", "wechat", "douyin", "bilibili", "custom")
+- `url` (string)
+- `position` (integer for ordering)
+
+**Contact** Table (for visitor submissions):
+- `id`
+- `page_id` (foreign key to Page)
+- `phone` (nullable)
+- `email` (nullable)
+- `wechat_id` (nullable)
+- `created_at`
+
+**Analytics** Table:
+- `id`
+- `page_id` (foreign key)
+- `views_count` (integer)
+- `clicks_count` (integer)
+- `timestamp`
+
+*Ensure you validate schema migrations before applying and use correct Drizzle ORM syntax (e.g., `.array()` for arrays).*
+
+---
+
+## 🔑 Key Implementation Details
+
+1. **Next.js 15 & Server Actions**:
+   - Organize routes in the `app/` directory (e.g., `app/p/[slug]/page.tsx` for the public aggregator page).
+   - All server actions must be async and have a single "use server" directive.
+   - **Dynamic Route Parameters**: Always await parameters:
+     ```typescript
+     export default async function Page({ params }) {
+       const { locale } = await params;
+       // Use locale safely here
+     }
+     ```
+
+2. **Lucia Authentication**:
+   - Configure Lucia to handle registration and login.
+   - Use consistent Scrypt password hashing with the required hash format.
+   - Extend `DatabaseUserAttributes` in TypeScript for role-based access control:
+     ```typescript
+     // In src/lib/auth/types.ts
+     declare module "lucia" {
+       interface DatabaseUserAttributes {
+         id: string;
+         email: string;
+         displayName?: string;
+         role: "ADMIN" | "USER" | "GUEST";
+       }
+     }
+     ```
+
+3. **Tailwind CSS + Shadcn UI + Radix UI**:
+   - Provide a base theme with Tailwind CSS.
+   - Use Shadcn UI and Radix components for forms, modals, and buttons.
+   - Utilize Lucide icons for platform-specific elements.
+   - Self-host fonts or use a China-based CDN.
+
+4. **React Hook Form**:
+   - Implement in registration forms, aggregator page editor, and contact forms.
+   - Enforce validations (e.g., proper email and phone number formats).
+
+5. **Environment Setup**:
+   - Create a comprehensive `.env` file with all necessary variables (database connection strings, auth secrets, etc.).
+   - Document each environment variable in an `.env.example` file.
+   - Test your database connection using the correct connection string format (e.g., `postgres://username@localhost:5432/database_name`).
+
+6. **Error Handling**:
+   - Display meaningful error messages on the frontend.
+   - Log detailed errors server-side with consistent API error response formats (HTTP status codes, error messages).
+   - Provide graceful recovery paths for common errors.
+
+7. **Database Migrations & Seeding**:
+   - Create idempotent migration scripts for all schema changes.
+   - Include seed data for initial setup and test thoroughly before deployment.
+   - Update TypeScript interfaces when schema changes occur.
+
+---
+
+## 📁 Deliverables
+
+1. **Directory Structure**:
+   - `app/` for Next.js pages and server components.
+   - `components/` for shared UI components.
+   - `lib/` for utilities and helper functions.
+   - `db/` for Drizzle ORM schema and migration scripts.
+   - `pages/api/` if API routes are used.
+
+2. **Next.js Pages/Server Components** for:
+   - Registration, Login, Dashboard, Aggregator Page Editor, and Public Aggregator Page.
+
+3. **Drizzle Model Definitions & Migration Files**.
+
+4. **Lucia Authentication Configuration** with extended user types.
+
+5. **Tailwind/Shadcn UI** component examples for layout and styling.
+
+6. **React Hook Form** usage in forms with proper validations.
+
+7. **Basic Analytics** logic: capturing page views, link clicks, and form submissions.
+
+8. **TypeScript Interfaces/Types** for User, Page, Link, Contact, and Analytics.
+
+---
+
+## 🎯 Goal
+
+After executing this prompt, you should have a working, minimal codebase for a Chinese Social Media Follower Hub that adheres to Next.js 15, Drizzle ORM, Lucia, and TypeScript best practices. The application will be optimized for Chinese content creators (Xiaohongshu, WeChat, Douyin, Bilibili) with robust data capture, analytics, and proper environment and error handling per the defined rules.
